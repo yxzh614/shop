@@ -48,6 +48,15 @@
                 </transition-group>
                 <div v-if="goodList.length == 0">仓库中没有商品</div>
         </ul>
+        <ul class="good-list">
+            <h2>出售记录</h2>
+                <transition-group name="list-complete" tag="p">
+                    <li class="list-complete-item" v-for="good in sellList" :key="good.id">
+                        出售{{good.name}}共{{good.amount}}个,获利{{good.benifit}}元
+                    </li>
+                </transition-group>
+                <div v-if="sellList.length == 0">没有出售商品</div>
+        </ul>
     </div>
 </template>
 
@@ -72,6 +81,7 @@ export default {
                 {
                     id: 0,
                     name: '苹果',
+                    amount: 0,
                     benifit: 0
                 }
             ]
@@ -116,18 +126,27 @@ export default {
                     this.selected = null
                 }
                 this.totalGet += this.toSell * (good.sell - good.cost)
+                this.pushToSellList(good, this.toSell, this.toSell * (good.sell - good.cost))
                 this.getTotalSell()
                 this.getTotalCost()
                 return
             }
             if (this.toSell < good.amount) {
                 good.amount -= this.toSell
-                this.totalGet += this.toSell * (good.sell - good.cost)
+                this.pushToSellList(good, this.toSell, this.toSell * (good.sell - good.cost))
                 this.getTotalSell()
                 this.getTotalCost()
             } else {
                 alert('数量超出最大限制')
             }
+        },
+        pushToSellList (good, amount, benifit) {
+            this.sellList.push({
+                id: good.id,
+                name: good.name,
+                amount,
+                benifit
+            })
         },
         getTotalSell () {
             let t = 0
@@ -150,11 +169,14 @@ export default {
 <style>
 ul {
     list-style: none;
+    margin-top: 0;
 }
 .count {
     border: #ff5656 solid 1px;
-    padding: 60px;
+    padding: 20px;
     border-radius: 5px;
+    min-height: 70vh;
+    min-width: 20vw;
 }
 .main {
     border: #ff5656 solid 1px;
@@ -163,6 +185,7 @@ ul {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-around;
+    align-items: flex-start;
 }
 input[type="text"] {
     border: 0;
@@ -188,6 +211,8 @@ button:active {
     display: flex;
     flex-flow: column nowrap;
     text-align: right;
+    min-height: 70vh;
+    min-width: 20vw;
 }
 .selected {
     background: #ff5656;
@@ -198,6 +223,11 @@ button:active {
     border: #ff5656 solid 1px;
     padding: 20px;
     border-radius: 5px;
+    max-height: 70vh;
+    min-height: 70vh;
+    min-width: 20vw;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }.list-complete-item {
   transition: all 0.6s;
 }
